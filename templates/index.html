@@ -287,17 +287,17 @@
       <div class="input-tabs">
         <button class="itab active">SMS / Text</button>
         <button class="itab">CSV</button>
-        <button class="itab">Bank Log</button>
+        <button class="itab">Web Link (via Bright Data) ⚡</button>
       </div>
     </div>
     <div class="input-area">
-      <textarea id="demoTA" placeholder="Paste bank SMS messages, transaction logs, or any raw expense text here...
+      <textarea id="demoTA" placeholder="Paste bank SMS messages, transaction logs, OR paste a website URL to a bank/receipt portal...
 
-Example:
+Example Text:
 Spent ₹450 at Swiggy on 12 Jul
-UPI to Uber ₹220 on 13 Jul
-Amazon purchase ₹3200 on 14 Jul
-Starbucks ₹380 on 14 Jul"></textarea>
+
+Example URL:
+https://example.com/my-receipts"></textarea>
     </div>
     <div class="input-footer">
       <span class="char-count" id="charCount">0 characters</span>
@@ -319,23 +319,23 @@ Starbucks ₹380 on 14 Jul"></textarea>
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-label">Total spent</div>
-      <div class="stat-value">₹14,820</div>
-      <div class="stat-sub">July 2024</div>
+      <div id="stat-total" class="stat-value">₹0</div>
+      <div class="stat-sub">This Period</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Transactions</div>
-      <div class="stat-value">20</div>
-      <div class="stat-sub">Avg ₹741 each</div>
+      <div id="stat-tx" class="stat-value">0</div>
+      <div class="stat-sub">Detected</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Top category</div>
-      <div class="stat-value" style="font-size:17px;padding-top:3px;">Food & Dining</div>
-      <div class="stat-badge badge-warn">₹5,630 — 38%</div>
+      <div id="stat-top-cat" class="stat-value" style="font-size:17px;padding-top:3px;">-</div>
+      <div id="stat-top-val" class="stat-badge badge-warn">₹0 — 0%</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Subscriptions</div>
-      <div class="stat-value">₹1,796</div>
-      <div class="stat-badge badge-warn">4 active</div>
+      <div id="stat-sub-val" class="stat-value">₹0</div>
+      <div id="stat-sub-count" class="stat-badge badge-warn">0 active</div>
     </div>
   </div>
 
@@ -516,7 +516,7 @@ Starbucks ₹380 on 14 Jul"></textarea>
   const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
   const textColor = isDark ? '#aaa' : '#888';
 
-  new Chart(document.getElementById('donutChart'), {
+  window.donutChart = new Chart(document.getElementById('donutChart'), {
     type: 'doughnut',
     data: {
       labels: ['Food & Dining','Shopping','Subscriptions','Transport','Other'],
@@ -536,7 +536,7 @@ Starbucks ₹380 on 14 Jul"></textarea>
     }
   });
 
-  new Chart(document.getElementById('lineChart'), {
+  window.lineChart = new Chart(document.getElementById('lineChart'), {
     type: 'line',
     data: {
       labels: ['Jul 10','Jul 11','Jul 12','Jul 13','Jul 14','Jul 15','Jul 16','Jul 17','Jul 18','Jul 19'],
@@ -578,9 +578,32 @@ Starbucks ₹380 on 14 Jul"></textarea>
       });
       const data = await response.json();
       
-      // Since the frontend is static, we just show a browser alert with the AI insight!
-      alert("ClariFi AI Insight:\n\n" + data.response);
-      console.log(data.response);
+      try {
+        // Parse the AI's JSON output
+        const aiData = JSON.parse(data.response);
+        
+        // 1. Update the Stat Cards
+        document.getElementById('stat-total').innerText = '₹' + aiData.total_spent.toLocaleString('en-IN');
+        document.getElementById('stat-tx').innerText = aiData.transaction_count;
+        document.getElementById('stat-top-cat').innerText = aiData.top_category_name;
+        document.getElementById('stat-top-val').innerText = `₹${aiData.top_category_amount} — ${aiData.top_category_percent}`;
+        document.getElementById('stat-sub-val').innerText = '₹' + aiData.subscriptions_total;
+        document.getElementById('stat-sub-count').innerText = `${aiData.subscriptions_count} active`;
+        
+        // 2. Update the Donut Chart
+        window.donutChart.data.datasets[0].data = aiData.donut;
+        window.donutChart.update();
+        
+        // 3. Update the Line Chart
+        window.lineChart.data.labels = aiData.line_labels;
+        window.lineChart.data.datasets[0].data = aiData.line_data;
+        window.lineChart.update();
+        
+      } catch (parseError) {
+        console.error("AI did not return valid JSON:", data.response);
+        alert("The AI returned a plain text response instead of valid JSON charts:\n\n" + data.response);
+      }
+      
     } catch(e) {
       alert("Error calling AI: " + e);
     }
