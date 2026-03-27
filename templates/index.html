@@ -248,17 +248,28 @@
       setTimeout(() => t.classList.remove('show'), 2500);
     }
 
-    const donutLabels = ['Food','Shopping','Transport','Subscriptions','Bills','Healthcare','Grocery','Fitness','Other'];
-    const donutColors = ['#EF9F27','#7F77DD','#1D9E75','#378ADD','#E84393','#F87171','#34D399','#60A5FA','#888780'];
+    const donutLabels = ['Food','Shopping','Transport','Subscriptions','Bills','Healthcare','Grocery','Fitness'];
+    const donutColors = ['#EF9F27','#7F77DD','#1D9E75','#378ADD','#E84393','#F87171','#34D399','#60A5FA'];
 
     const donutChart = new Chart(document.getElementById('donutChart').getContext('2d'), {
-      type: 'doughnut', data: { labels: donutLabels, datasets: [{ data: [1], backgroundColor: donutColors, borderWidth: 0 }] },
+      type: 'doughnut', data: { labels: donutLabels, datasets: [{ data: [0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: donutColors, borderWidth: 0 }] },
       options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } }
     });
 
     const lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
-      type: 'line', data: { labels: ['-'], datasets: [{ label: 'Spent', data: [0], borderColor: '#7F77DD', tension: 0.4, fill: true, backgroundColor: 'rgba(127,119,221,0.1)' }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Spent', data: [], borderColor: '#7F77DD', pointBackgroundColor: '#7F77DD', tension: 0.4, fill: true, backgroundColor: 'rgba(127,119,221,0.1)' }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: {
+            ticks: { color: 'rgba(255,255,255,0.5)', maxRotation: 45, minRotation: 30, font: { size: 10 } },
+            grid: { color: 'rgba(255,255,255,0.04)' }
+          },
+          y: { beginAtZero: true, ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+        }
+      }
     });
 
     async function sendPrompt() {
@@ -289,7 +300,12 @@
 
         donutChart.data.datasets[0].data = aiData.donut;
         donutChart.update();
-        document.getElementById('donutLegend').innerHTML = donutLabels.map((l, i) => `<span><span style="display:inline-block;width:8px;height:8px;background:${donutColors[i]};margin-right:4px"></span>${l} ${aiData.donut[i]}%</span>`).join('');
+        document.getElementById('donutLegend').innerHTML = donutLabels
+          .map((l, i) => ({ label: l, val: aiData.donut[i] || 0, color: donutColors[i] }))
+          .filter(x => x.val > 0)
+          .sort((a, b) => b.val - a.val)
+          .map(x => `<span><span style="display:inline-block;width:8px;height:8px;background:${x.color};margin-right:4px"></span>${x.label} ${x.val}%</span>`)
+          .join('');
 
         lineChart.data.labels = aiData.line_labels;
         lineChart.data.datasets[0].data = aiData.line_data;

@@ -15,7 +15,7 @@ client = OpenAI(
 BRIGHTDATA_API_KEY = os.getenv("BRIGHTDATA_API_KEY", "YOUR_BRIGHTDATA_API_KEY")
 BRIGHTDATA_ZONE = os.getenv("BRIGHTDATA_ZONE", "web_unlocker1")
 
-CATEGORY_ORDER = ["food", "shopping", "transport", "subscriptions", "bills", "healthcare", "grocery", "fitness", "other"]
+CATEGORY_ORDER = ["food", "shopping", "transport", "subscriptions", "bills", "healthcare", "grocery", "fitness"]
 
 # Keywords that signal an incoming credit/refund (not an expense)
 CREDIT_KEYWORDS = [
@@ -122,9 +122,9 @@ def compute_analytics(data: dict, expense_txns: list[dict]) -> dict:
     # Category totals
     cat_totals: dict[str, float] = {}
     for t in expense_txns:
-        cat = str(t.get("category", "other")).lower()
+        cat = str(t.get("category", "shopping")).lower()
         if cat not in CATEGORY_ORDER:
-            cat = "other"
+            cat = "shopping"
         cat_totals[cat] = cat_totals.get(cat, 0.0) + float(t["amount"])
 
     # Top category
@@ -155,24 +155,29 @@ def compute_analytics(data: dict, expense_txns: list[dict]) -> dict:
             floors[remainders[i][1]] += 1
         data["donut"] = floors
     else:
-        data["donut"] = [0] * 9
+        data["donut"] = [0] * 8
 
-    # Line chart — group by date
-    dated = sorted(
-        [t for t in expense_txns if t.get("date")],
-        key=lambda t: t.get("date", "")
-    )
-    if dated:
-        date_map: dict[str, float] = {}
-        for t in dated:
-            d = t["date"]
-            date_map[d] = date_map.get(d, 0.0) + float(t["amount"])
-        data["line_labels"] = list(date_map.keys())
-        data["line_data"] = [int(float(v) * 100) / 100.0 for v in date_map.values()]
-    else:
-        data["line_labels"] = ["Total"]
-        data["line_data"] = [total_spent]
+    # Line chart — one point per transaction, in date order
+    # Use date as label if available, else abbreviated merchant name
+    def sort_key(t: dict) -> str:
+        d = t.get("date", "")
+        if not d:
+            return "zzz"  # push undated to end
+        # Normalise for sorting: extract leading digits
+        num = re.match(r'^(\d+)', d)
+        return f"{int(num.group(1)):02d}_{d}" if num else d
 
+    sorted_txns = sorted(expense_txns, key=sort_key)
+    line_labels: list[str] = []
+    line_data: list[float] = []
+    for t in sorted_txns:
+        # Use the merchant / keyword for the timeline instead of just the date
+        label = str(t.get("merchant", "Tx") or "Tx")[:20]  # type: ignore
+        line_labels.append(label)
+        line_data.append(int(float(t["amount"]) * 100) / 100.0)
+
+    data["line_labels"] = line_labels
+    data["line_data"] = line_data
     return data
 
 
@@ -183,7 +188,7 @@ def extract_json(text: str) -> dict:
     end = text.rfind('}')
     if start == -1 or end == -1:
         raise ValueError("No JSON object found in AI response")
-    json_str = text[start:end + 1]
+    json_str = text[start:end + 1]  # type: ignore
     json_str = re.sub(r',\s*([}\]])', r'\1', json_str)  # trailing commas
     return json.loads(json_str)
 
@@ -242,17 +247,16 @@ def analyze_expenses():
         system_prompt = """You are a financial categorizer. Output ONLY valid JSON, nothing else.
 
 CATEGORIES (pick exactly one per transaction):
-food, grocery, transport, shopping, subscriptions, bills, healthcare, fitness, other
+food, grocery, transport, shopping, subscriptions, bills, healthcare, fitness
 
 - bills: rent, internet, electricity, phone bill, gas, maintenance
 - food: restaurants, cafes, food delivery (Swiggy, Zomato, Pizza Hut)
 - grocery: BigBasket, supermarket, DMart, kirana
 - transport: petrol, Uber, Ola, metro, train, flight, fuel
-- shopping: clothes, shoes, electronics, e-commerce, Amazon
+- shopping: clothes, shoes, electronics, e-commerce, Amazon, events, entertainment, movies, everything else
 - subscriptions: Netflix, Spotify, Prime, Hotstar, recurring monthly fee
 - healthcare: medicine, pharmacy (PharmEasy, 1mg), doctor, hospital
 - fitness: gym membership only
-- other: movies, events, entertainment, anything else
 
 Return exactly this JSON (categories array must have same length as transactions list):
 {"categories":["cat1","cat2"],"waste_score":0,"patterns":["p1","p2","p3"],"action_plan":[{"title":"","desc":"","saving":""}]}"""
@@ -285,8 +289,8 @@ Return exactly this JSON (categories array must have same length as transactions
 
         categories: list = ai.get("categories", [])
         for i, t in enumerate(expenses):
-            cat = categories[i].lower().strip() if i < len(categories) else "other"
-            t["category"] = cat if cat in CATEGORY_ORDER else "other"
+            cat = categories[i].lower().strip() if i < len(categories) else "shopping"
+            t["category"] = cat if cat in CATEGORY_ORDER else "shopping"
 
         # ── Step 5: build result dict, compute ALL analytics server-side ─────
         result: dict = {
@@ -304,7 +308,7 @@ Return exactly this JSON (categories array must have same length as transactions
             "top_category_amount": 0.0,
             "subscriptions_total": 0.0,
             "subscriptions_count": 0,
-            "donut": [0] * 9,
+            "donut": [0] * 8,
             "line_labels": [],
             "line_data": [],
         }
