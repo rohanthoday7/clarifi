@@ -57,30 +57,71 @@ def analyze_expenses():
 
         # Run chat completions via Featherless
         print("Sending to Featherless AI...")
-        system_instruction = """You are a financial assistant named ClariFi. 
-You must analyze the user's input expenses and return ONLY raw, valid JSON. YOU MUST CALCULATE ACCURATE NUMBERS purely based on the user's input. Do NOT copy the sample data from this prompt.
+        system_instruction = """You are ClariFi, an expert expense analyzer. Every time a user pastes transaction data, automatically generate a full analysis. Return ONLY a single raw valid JSON object — no markdown, no backticks, no intro text.
 
-Format to strictly follow:
+Categories to use:
+- food (Swiggy, Zomato, Starbucks, Restaurant, food delivery)
+- shopping (Amazon, Flipkart, Myntra, Zara, retail)
+- transport (Uber, Ola, Petrol, Bus, auto)
+- subscriptions (Netflix, Spotify, Apple Music, Prime, any subscription)
+- bills (Electricity, Recharge, phone bill, broadband)
+- healthcare (Medical store, pharmacy, doctor, hospital)
+- grocery (Grocery, supermarket, BigBasket, DMart)
+- fitness (Gym, yoga, sports)
+- other (anything else)
+
+CRITICAL: skip credits/income (UPI received, salary, refunds) from totals but include them in credits array.
+
+JSON Schema to return:
 {
-  "thinking_process": "Write out your step-by-step logic and calculation scratchpad here. Add up the expenses, assign categories, and do the percentages math CAREFULLY before filling out the rest of the JSON.",
-  "total_spent": 1234,
-  "transaction_count": 3,
-  "top_category_name": "Food & Dining",
-  "top_category_percent": "50%",
-  "top_category_amount": 617,
+  "thinking_process": "scratchpad: list each line item, assign category and amount, sum per category, compute percentages",
+  "total_spent": 0,
+  "transaction_count": 0,
+  "avg_transaction": 0,
+  "top_category_name": "Shopping",
+  "top_category_percent": "35%",
+  "top_category_amount": 0,
   "subscriptions_total": 0,
   "subscriptions_count": 0,
-  "donut": [50, 20, 0, 10, 20], 
-  "line_labels": ["Jul 12", "Jul 13", "Jul 14"],
-  "line_data": [450, 0, 784]
+  "waste_score": 42,
+  "donut": [20, 35, 10, 5, 10, 5, 10, 5, 0],
+  "line_labels": ["Jul 12", "Jul 13"],
+  "line_data": [500, 1200],
+  "transactions": [
+    {"merchant": "Swiggy", "date": "Jul 12", "category": "food", "amount": 450}
+  ],
+  "credits": [
+    {"source": "UPI from Rahul", "date": "Jul 15", "amount": 500}
+  ],
+  "category_breakdown": [
+    {"name": "Food & Dining", "key": "food", "amount": 0, "percent": "0%"},
+    {"name": "Shopping", "key": "shopping", "amount": 0, "percent": "0%"},
+    {"name": "Transport", "key": "transport", "amount": 0, "percent": "0%"},
+    {"name": "Subscriptions", "key": "subscriptions", "amount": 0, "percent": "0%"},
+    {"name": "Bills & Utilities", "key": "bills", "amount": 0, "percent": "0%"},
+    {"name": "Healthcare", "key": "healthcare", "amount": 0, "percent": "0%"},
+    {"name": "Grocery", "key": "grocery", "amount": 0, "percent": "0%"},
+    {"name": "Fitness", "key": "fitness", "amount": 0, "percent": "0%"},
+    {"name": "Other", "key": "other", "amount": 0, "percent": "0%"}
+  ],
+  "patterns": [
+    "Food delivery 3x in 7 days — ₹1,120 total",
+    "Duplicate streaming subscriptions detected",
+    "Impulse shopping spike of ₹4,499 on Jul 14"
+  ],
+  "action_plan": [
+    {"title": "Cancel duplicate streaming sub", "desc": "You pay for both Netflix and Spotify. Cancel one to save ₹499/mo.", "saving": "₹5,988/yr"},
+    {"title": "Set weekly food delivery cap", "desc": "3 orders in 7 days at ₹1,120. Cap at ₹600/week by cooking 2 meals at home.", "saving": "₹2,500/mo"},
+    {"title": "Review impulse shopping", "desc": "₹4,499 Amazon + Flipkart spike on one day. Add items to cart and wait 24hrs before buying.", "saving": "₹3,000/mo"}
+  ]
 }
 
-CRITICAL RULES:
-1. `thinking_process` must be the very first key. Use it to map out the math before answering!
-2. `donut` array MUST contain exactly 5 integer percentages [Food, Shopping, Subscriptions, Transport, Other] that sum to 100.
-3. `line_labels` must be the unique dates found in the text.
-4. `line_data` must be the math sum of all expenses spent on each corresponding date in line_labels.
-5. If the text has no expenses, return zeroes. Output raw JSON object only. No intro."""
+RULES:
+1. thinking_process must be first. Use it to enumerate every line item and do the math.
+2. donut = 9 integers [food, shopping, transport, subscriptions, bills, healthcare, grocery, fitness, other] summing to 100.
+3. line_labels = unique dates; line_data = total expenses per date (no credits).
+4. waste_score: 0–25 = efficient, 26–50 = moderate, 51–75 = wasteful, 76–100 = very wasteful. Base on food delivery frequency, duplicate subs, impulse spikes, small discretionary habits.
+5. All amounts must EXACTLY match the user's data. No invented numbers. Raw JSON only."""
         
         chat_completions = client.chat.completions.create(
             model="Qwen/Qwen2.5-7B-Instruct",

@@ -31,8 +31,8 @@
     --border-radius-lg: 18px;
   }
 
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  
   body { 
     font-family: var(--font-sans); 
     background-color: var(--color-background-root);
@@ -44,35 +44,26 @@
       radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.08), transparent 50%);
     background-attachment: fixed;
   }
+  .page { max-width: 860px; margin: 0 auto; padding: 0 0 60px; }
 
-  /* Micro-animations for all cards */
-  .stat-card, .chart-card, .tx-card, .waste-card, .action-card, .input-card {
-    backdrop-filter: blur(12px);
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  .stat-card:hover, .chart-card:hover, .waste-card:hover, .action-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  }
-
-  .page { max-width: 860px; margin: 0 auto; padding: 0 20px 60px; }
-
-  /* ── NAV ── */
   nav {
     display: flex; align-items: center; justify-content: space-between;
     padding: 20px 0 18px; border-bottom: 0.5px solid var(--color-border-tertiary);
     margin-bottom: 48px;
   }
-  .nav-logo { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+  .nav-logo { font-size: 18px; font-weight: 500; color: var(--color-text-primary); cursor: pointer; transition: opacity .15s; }
+  .nav-logo:hover { opacity: .6; }
   .nav-logo sup { font-size: 10px; color: var(--color-text-secondary); font-weight: 400; letter-spacing: .04em; }
+  .nav-link { font-size: 13px; color: var(--color-text-secondary); cursor: pointer; padding: 6px 10px; border-radius: var(--border-radius-md); transition: background .15s, color .15s; }
+  .nav-link:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
   .nav-pill {
     font-size: 12px; padding: 4px 12px; border-radius: 100px;
     background: var(--color-background-success); color: var(--color-text-success);
-    border: 0.5px solid var(--color-border-success);
+    border: 0.5px solid var(--color-border-success); cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
   }
+  .nav-pill:hover { transform: scale(1.06); }
 
-  /* ── HERO ── */
   .hero { margin-bottom: 48px; }
   .hero-eyebrow {
     font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
@@ -91,39 +82,44 @@
     border-radius: var(--border-radius-md);
     color: var(--color-text-secondary);
     background: var(--color-background-secondary);
+    cursor: pointer; transition: border-color .15s, color .15s, background .15s, transform .12s;
+    user-select: none;
   }
+  .chip:hover { border-color: var(--color-border-primary); color: var(--color-text-primary); transform: translateY(-1px); }
+  .chip:active { transform: scale(.97); }
+  .chip.active { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); }
 
-  /* ── INPUT SECTION ── */
-  .section-label {
-    font-size: 11px; text-transform: uppercase; letter-spacing: .09em;
-    color: var(--color-text-secondary); margin-bottom: 12px;
-  }
+  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: var(--color-text-secondary); margin-bottom: 12px; }
 
   .input-card {
     background: var(--color-background-primary);
     border: 0.5px solid var(--color-border-tertiary);
-    border-radius: var(--border-radius-lg);
-    overflow: hidden; margin-bottom: 48px;
+    border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 48px;
   }
-
   .input-toolbar {
     padding: 10px 16px; border-bottom: 0.5px solid var(--color-border-tertiary);
     display: flex; align-items: center; justify-content: space-between;
     background: var(--color-background-secondary);
   }
   .input-toolbar-left { display: flex; gap: 6px; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--color-border-secondary); }
+  .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--color-border-secondary); cursor: pointer;
+    transition: transform .15s, background .15s;
+  }
+  .dot:hover { transform: scale(1.3); }
+  .dot:nth-child(1):hover { background: #E24B4A; }
+  .dot:nth-child(2):hover { background: #EF9F27; }
+  .dot:nth-child(3):hover { background: #1D9E75; }
 
   .input-tabs { display: flex; gap: 2px; }
   .itab {
     font-size: 12px; padding: 4px 10px; border-radius: var(--border-radius-md);
     color: var(--color-text-secondary); cursor: pointer; border: none; background: transparent;
+    transition: background .15s, color .15s;
   }
-  .itab.active {
-    background: var(--color-background-primary);
-    border: 0.5px solid var(--color-border-tertiary);
-    color: var(--color-text-primary);
-  }
+  .itab:hover { background: var(--color-background-primary); color: var(--color-text-primary); }
+  .itab.active { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); }
 
   .input-area { padding: 16px; }
   textarea {
@@ -144,123 +140,169 @@
     background: var(--color-text-primary); color: var(--color-background-primary);
     border: none; border-radius: var(--border-radius-md); cursor: pointer;
     display: flex; align-items: center; gap: 6px;
-    transition: opacity .15s;
+    transition: opacity .15s, transform .12s;
   }
-  .btn-analyze:hover { opacity: .85; }
+  .btn-analyze:hover { opacity: .8; transform: translateY(-1px); }
+  .btn-analyze:active { transform: scale(.97); opacity: 1; }
 
-  /* ── DIVIDER ── */
   .divider { display: flex; align-items: center; gap: 16px; margin: 40px 0 32px; }
   .divider-line { flex: 1; height: 0.5px; background: var(--color-border-tertiary); }
   .divider-label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--color-text-secondary); }
 
-  /* ── STAT CARDS ── */
   .stats-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 28px; }
   .stat-card {
     background: var(--color-background-secondary);
     border-radius: var(--border-radius-md); padding: 14px 16px;
+    cursor: pointer; transition: transform .15s, box-shadow .15s;
+    position: relative; overflow: hidden;
   }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-card:active { transform: scale(.98); }
   .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--color-text-secondary); margin-bottom: 6px; }
   .stat-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); line-height: 1; }
   .stat-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
-  .stat-badge {
-    display: inline-block; margin-top: 6px; font-size: 11px; padding: 2px 8px;
-    border-radius: 100px;
-  }
+  .stat-badge { display: inline-block; margin-top: 6px; font-size: 11px; padding: 2px 8px; border-radius: 100px; }
   .badge-warn { background: var(--color-background-warning); color: var(--color-text-warning); }
   .badge-ok { background: var(--color-background-success); color: var(--color-text-success); }
 
-  /* ── CHARTS ROW ── */
   .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
   .chart-card {
     background: var(--color-background-primary);
     border: 0.5px solid var(--color-border-tertiary);
     border-radius: var(--border-radius-lg); padding: 16px;
+    transition: border-color .2s;
   }
+  .chart-card:hover { border-color: var(--color-border-secondary); }
   .chart-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; color: var(--color-text-primary); }
   .chart-sub { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 14px; }
 
-  /* ── TRANSACTIONS ── */
   .tx-card {
     background: var(--color-background-primary);
     border: 0.5px solid var(--color-border-tertiary);
-    border-radius: var(--border-radius-lg);
-    overflow: hidden; margin-bottom: 28px;
+    border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 28px;
   }
   .tx-header {
     padding: 14px 16px; border-bottom: 0.5px solid var(--color-border-tertiary);
     display: flex; justify-content: space-between; align-items: center;
   }
   .tx-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
-  .tx-filter { font-size: 12px; color: var(--color-text-secondary); cursor: pointer; }
+  .tx-filter {
+    font-size: 12px; color: var(--color-text-secondary); cursor: pointer;
+    padding: 4px 8px; border-radius: var(--border-radius-md);
+    transition: background .15s, color .15s;
+  }
+  .tx-filter:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+
   table { width: 100%; border-collapse: collapse; }
   thead th {
     font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
-    color: var(--color-text-secondary); padding: 10px 16px;
-    text-align: left; border-bottom: 0.5px solid var(--color-border-tertiary);
-    background: var(--color-background-secondary); font-weight: 400;
+    color: var(--color-text-secondary); padding: 10px 16px; text-align: left;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-secondary); font-weight: 400; cursor: pointer;
+    transition: color .15s; user-select: none;
   }
-  tbody tr { border-bottom: 0.5px solid var(--color-border-tertiary); }
+  thead th:hover { color: var(--color-text-primary); }
+  thead th .sort-icon { opacity: .4; margin-left: 4px; font-style: normal; }
+  thead th:hover .sort-icon { opacity: 1; }
+
+  tbody tr { border-bottom: 0.5px solid var(--color-border-tertiary); cursor: pointer; }
   tbody tr:last-child { border-bottom: none; }
+  tbody tr td { padding: 11px 16px; font-size: 13px; color: var(--color-text-primary); transition: background .1s; }
   tbody tr:hover td { background: var(--color-background-secondary); }
-  tbody td { padding: 11px 16px; font-size: 13px; color: var(--color-text-primary); }
+  tbody tr:active td { background: var(--color-background-tertiary); }
+
   .tx-merchant { font-weight: 500; }
   .tx-date { color: var(--color-text-secondary); }
-  .tx-cat {
-    display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: var(--border-radius-md);
-  }
+  .tx-cat { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: var(--border-radius-md); }
   .cat-food { background: #FAEEDA; color: #633806; }
   .cat-transport { background: #E1F5EE; color: #085041; }
   .cat-shopping { background: #EEEDFE; color: #26215C; }
   .cat-sub { background: #E6F1FB; color: #042C53; }
   .tx-amount { font-size: 13px; font-weight: 500; text-align: right; }
-  .amount-out { color: var(--color-text-primary); }
-  .tx-flag { font-size: 10px; color: var(--color-text-warning); }
+  .tx-flag {
+    font-size: 10px; color: var(--color-text-warning); cursor: pointer;
+    padding: 2px 6px; border-radius: 100px; transition: background .15s;
+  }
+  .tx-flag:hover { background: var(--color-background-warning); }
 
-  /* ── ACTION CARDS ── */
-  .actions-grid { display: grid; gap: 12px; }
-  .action-card {
-    background: var(--color-background-primary);
-    border: 0.5px solid var(--color-border-tertiary);
-    border-radius: var(--border-radius-lg); padding: 16px 18px;
-    display: grid; grid-template-columns: 36px 1fr auto; gap: 14px; align-items: start;
-  }
-  .action-icon-wrap {
-    width: 36px; height: 36px; border-radius: var(--border-radius-md);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .icon-save { background: var(--color-background-success); }
-  .icon-warn { background: var(--color-background-warning); }
-  .icon-cut { background: var(--color-background-danger); }
-  .icon-svg { width: 16px; height: 16px; }
-  .action-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; color: var(--color-text-primary); }
-  .action-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.55; }
-  .action-saving {
-    font-size: 13px; font-weight: 500; white-space: nowrap; padding-top: 2px;
-    color: var(--color-text-success);
-  }
-
-  /* ── WASTE METER ── */
   .waste-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
   .waste-card {
     background: var(--color-background-primary);
     border: 0.5px solid var(--color-border-tertiary);
     border-radius: var(--border-radius-lg); padding: 16px;
   }
-  .meter-track { height: 6px; background: var(--color-background-secondary); border-radius: 100px; overflow: hidden; margin: 10px 0 6px; }
-  .meter-fill { height: 100%; border-radius: 100px; }
+  .meter-track { height: 6px; background: var(--color-background-secondary); border-radius: 100px; overflow: hidden; margin: 10px 0 6px; cursor: pointer; }
+  .meter-fill { height: 100%; border-radius: 100px; transition: width .6s cubic-bezier(.16,1,.3,1); }
   .meter-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--color-text-secondary); }
-  .score-num { font-size: 32px; font-weight: 500; }
+  .score-num { font-size: 32px; font-weight: 500; transition: color .3s; }
+
+  .pattern-row {
+    display: flex; align-items: center; gap: 8px; padding: 5px 6px;
+    border-radius: var(--border-radius-md); cursor: pointer; transition: background .15s;
+  }
+  .pattern-row:hover { background: var(--color-background-secondary); }
+  .pattern-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; transition: transform .15s; }
+  .pattern-row:hover .pattern-dot { transform: scale(1.5); }
+
+  .actions-grid { display: grid; gap: 12px; }
+  .action-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg); padding: 16px 18px;
+    display: grid; grid-template-columns: 36px 1fr auto; gap: 14px; align-items: start;
+    cursor: pointer; transition: border-color .2s, transform .15s;
+  }
+  .action-card:hover { border-color: var(--color-border-secondary); transform: translateX(3px); }
+  .action-card:active { transform: scale(.99); }
+
+  .action-icon-wrap {
+    width: 36px; height: 36px; border-radius: var(--border-radius-md);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .2s;
+  }
+  .action-card:hover .action-icon-wrap { transform: rotate(8deg) scale(1.1); }
+  .icon-save { background: var(--color-background-success); }
+  .icon-warn { background: var(--color-background-warning); }
+  .icon-cut { background: var(--color-background-danger); }
+  .icon-svg { width: 16px; height: 16px; }
+  .action-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; color: var(--color-text-primary); }
+  .action-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.55; }
+  .action-saving { font-size: 13px; font-weight: 500; white-space: nowrap; padding-top: 2px; color: var(--color-text-success); transition: transform .2s; }
+  .action-card:hover .action-saving { transform: scale(1.05); }
+
+  /* Tooltip */
+  .tippy {
+    position: fixed; background: var(--color-text-primary); color: var(--color-background-primary);
+    font-size: 12px; padding: 5px 10px; border-radius: var(--border-radius-md);
+    pointer-events: none; opacity: 0; transition: opacity .15s;
+    white-space: nowrap; z-index: 999;
+  }
+  .tippy.show { opacity: 1; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(10px);
+    background: var(--color-text-primary); color: var(--color-background-primary);
+    font-size: 13px; padding: 10px 18px; border-radius: var(--border-radius-lg);
+    opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 
 <div class="page">
 
+  <!-- TOOLTIP -->
+  <div class="tippy" id="tippy"></div>
+  <div class="toast" id="toast"></div>
+
   <!-- NAV -->
   <nav>
-    <div class="nav-logo">ClariFi<sup>AI</sup></div>
-    <div style="display:flex;gap:10px;align-items:center;">
-      <span style="font-size:13px;color:var(--color-text-secondary);">Dashboard</span>
-      <span style="font-size:13px;color:var(--color-text-secondary);">History</span>
-      <div class="nav-pill">Live</div>
+    <div class="nav-logo" onclick="showToast('Welcome to ClariFi AI')">ClariFi<sup>AI</sup></div>
+    <div style="display:flex;gap:4px;align-items:center;">
+      <span class="nav-link" onclick="showToast('Dashboard view')">Dashboard</span>
+      <span class="nav-link" onclick="showToast('History coming soon')">History</span>
+      <div class="nav-pill" id="livePill" onclick="toggleLive()">Live</div>
     </div>
   </nav>
 
@@ -270,10 +312,10 @@
     <h1>Understand your money. <span>Make better decisions.</span></h1>
     <p>Paste any messy financial data — bank SMS, transaction logs, raw text — and get structured insights and a clear action plan in seconds.</p>
     <div class="feature-chips">
-      <span class="chip">Auto-extract transactions</span>
-      <span class="chip">Smart categorization</span>
-      <span class="chip">Waste detection</span>
-      <span class="chip">Actionable decisions</span>
+      <span class="chip" onclick="toggleChip(this)">Auto-extract transactions</span>
+      <span class="chip" onclick="toggleChip(this)">Smart categorization</span>
+      <span class="chip" onclick="toggleChip(this)">Waste detection</span>
+      <span class="chip" onclick="toggleChip(this)">Actionable decisions</span>
     </div>
   </div>
 
@@ -282,22 +324,24 @@
   <div class="input-card">
     <div class="input-toolbar">
       <div class="input-toolbar-left">
-        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <div class="dot" title="Close" onclick="showToast('Close panel')"></div>
+        <div class="dot" title="Minimise" onclick="showToast('Minimise panel')"></div>
+        <div class="dot" title="Expand" onclick="showToast('Expanded view')"></div>
       </div>
       <div class="input-tabs">
-        <button class="itab active">SMS / Text</button>
-        <button class="itab">CSV</button>
-        <button class="itab">Web Link (via Bright Data) ⚡</button>
+        <button class="itab active" onclick="switchTab(this,'SMS/Bank text')">SMS / Text</button>
+        <button class="itab" onclick="switchTab(this,'CSV upload')">CSV</button>
+        <button class="itab" onclick="switchTab(this,'Bank log')">Bank Log</button>
       </div>
     </div>
     <div class="input-area">
-      <textarea id="demoTA" placeholder="Paste bank SMS messages, transaction logs, OR paste a website URL to a bank/receipt portal...
+      <textarea id="demoTA" placeholder="Paste bank SMS messages, transaction logs, or any raw expense text here...
 
-Example Text:
+Example:
 Spent ₹450 at Swiggy on 12 Jul
-
-Example URL:
-https://example.com/my-receipts"></textarea>
+UPI to Uber ₹220 on 13 Jul
+Amazon purchase ₹3200 on 14 Jul
+Starbucks ₹380 on 14 Jul"></textarea>
     </div>
     <div class="input-footer">
       <span class="char-count" id="charCount">0 characters</span>
@@ -308,48 +352,48 @@ https://example.com/my-receipts"></textarea>
     </div>
   </div>
 
-  <!-- RESULTS DIVIDER -->
+  <!-- DIVIDER -->
   <div class="divider">
     <div class="divider-line"></div>
     <div class="divider-label">Sample results preview</div>
     <div class="divider-line"></div>
   </div>
 
-  <!-- STATS ROW -->
+  <!-- STATS -->
   <div class="stats-row">
-    <div class="stat-card">
+    <div class="stat-card" onclick="showToast('Total: ₹14,820 across 20 transactions')">
       <div class="stat-label">Total spent</div>
-      <div id="stat-total" class="stat-value">₹0</div>
-      <div class="stat-sub">This Period</div>
+      <div id="stat-total" class="stat-value">₹14,820</div>
+      <div class="stat-sub">July 2024</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" onclick="showToast('Average ₹741 per transaction')">
       <div class="stat-label">Transactions</div>
-      <div id="stat-tx" class="stat-value">0</div>
-      <div class="stat-sub">Detected</div>
+      <div id="stat-tx" class="stat-value">20</div>
+      <div class="stat-sub">Avg ₹741 each</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" onclick="showToast('Food & Dining is your biggest spend at 38%')">
       <div class="stat-label">Top category</div>
-      <div id="stat-top-cat" class="stat-value" style="font-size:17px;padding-top:3px;">-</div>
-      <div id="stat-top-val" class="stat-badge badge-warn">₹0 — 0%</div>
+      <div id="stat-top-cat" class="stat-value" style="font-size:17px;padding-top:3px;">Food & Dining</div>
+      <div id="stat-top-val" class="stat-badge badge-warn">₹5,630 — 38%</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" onclick="showToast('4 active subscriptions — 1 is a duplicate!')">
       <div class="stat-label">Subscriptions</div>
-      <div id="stat-sub-val" class="stat-value">₹0</div>
-      <div id="stat-sub-count" class="stat-badge badge-warn">0 active</div>
+      <div id="stat-sub-val" class="stat-value">₹1,796</div>
+      <div id="stat-sub-count" class="stat-badge badge-warn">4 active</div>
     </div>
   </div>
 
-  <!-- CHARTS ROW -->
+  <!-- CHARTS -->
   <div class="charts-row">
     <div class="chart-card">
       <div class="chart-title">Spending by category</div>
       <div class="chart-sub">Distribution across 5 categories</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#EF9F27;"></span>Food 38%</span>
-        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#7F77DD;"></span>Shopping 31%</span>
-        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#1D9E75;"></span>Transport 10%</span>
-        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#378ADD;"></span>Subs 12%</span>
-        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#888780;"></span>Other 9%</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);cursor:pointer;" onmouseenter="tip(event,'Food: ₹5,630')" onmouseleave="hideTip()"><span style="width:10px;height:10px;border-radius:2px;background:#EF9F27;"></span>Food 38%</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);cursor:pointer;" onmouseenter="tip(event,'Shopping: ₹4,594')" onmouseleave="hideTip()"><span style="width:10px;height:10px;border-radius:2px;background:#7F77DD;"></span>Shopping 31%</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);cursor:pointer;" onmouseenter="tip(event,'Transport: ₹1,482')" onmouseleave="hideTip()"><span style="width:10px;height:10px;border-radius:2px;background:#1D9E75;"></span>Transport 10%</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);cursor:pointer;" onmouseenter="tip(event,'Subscriptions: ₹1,796')" onmouseleave="hideTip()"><span style="width:10px;height:10px;border-radius:2px;background:#378ADD;"></span>Subs 12%</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);cursor:pointer;" onmouseenter="tip(event,'Other: ₹1,334')" onmouseleave="hideTip()"><span style="width:10px;height:10px;border-radius:2px;background:#888780;"></span>Other 9%</span>
       </div>
       <div style="position:relative;height:160px;"><canvas id="donutChart"></canvas></div>
     </div>
@@ -360,112 +404,113 @@ https://example.com/my-receipts"></textarea>
     </div>
   </div>
 
-  <!-- TRANSACTIONS TABLE -->
+  <!-- TRANSACTIONS -->
   <div class="tx-card">
     <div class="tx-header">
       <div class="tx-title">Transactions</div>
-      <div class="tx-filter">Filter by category ↓</div>
+      <div class="tx-filter" onclick="showToast('Filter by category — coming soon')">Filter by category ↓</div>
     </div>
     <table>
       <thead>
         <tr>
-          <th>Merchant</th>
-          <th>Date</th>
-          <th>Category</th>
-          <th style="text-align:right">Amount</th>
+          <th onclick="showToast('Sort by merchant')">Merchant <i class="sort-icon">↕</i></th>
+          <th onclick="showToast('Sort by date')">Date <i class="sort-icon">↕</i></th>
+          <th onclick="showToast('Sort by category')">Category <i class="sort-icon">↕</i></th>
+          <th style="text-align:right" onclick="showToast('Sort by amount')">Amount <i class="sort-icon">↕</i></th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><span class="tx-merchant">Swiggy</span> <span class="tx-flag">⚑ frequent</span></td>
+        <tr onclick="showToast('Swiggy — 8 orders this month, ₹5,630 total')">
+          <td><span class="tx-merchant">Swiggy</span> <span class="tx-flag" onclick="event.stopPropagation();showToast('Flagged: Ordered 8x this month!')">⚑ frequent</span></td>
           <td class="tx-date">Jul 10</td>
           <td><span class="tx-cat cat-food">Food & Dining</span></td>
-          <td class="tx-amount amount-out">₹850</td>
+          <td class="tx-amount">₹850</td>
         </tr>
-        <tr>
+        <tr onclick="showToast('Netflix — monthly subscription, auto-renews')">
           <td><span class="tx-merchant">Netflix</span></td>
           <td class="tx-date">Jul 10</td>
           <td><span class="tx-cat cat-sub">Subscription</span></td>
-          <td class="tx-amount amount-out">₹199</td>
+          <td class="tx-amount">₹199</td>
         </tr>
-        <tr>
+        <tr onclick="showToast('Uber — 4 rides this month, avg ₹310 each')">
           <td><span class="tx-merchant">Uber</span></td>
           <td class="tx-date">Jul 11</td>
           <td><span class="tx-cat cat-transport">Transport</span></td>
-          <td class="tx-amount amount-out">₹320</td>
+          <td class="tx-amount">₹320</td>
         </tr>
-        <tr>
+        <tr onclick="showToast('Amazon — shoes purchase on Jul 12')">
           <td><span class="tx-merchant">Amazon</span></td>
           <td class="tx-date">Jul 12</td>
           <td><span class="tx-cat cat-shopping">Shopping</span></td>
-          <td class="tx-amount amount-out">₹2,400</td>
+          <td class="tx-amount">₹2,400</td>
         </tr>
-        <tr>
-          <td><span class="tx-merchant">Starbucks</span> <span class="tx-flag">⚑ daily habit</span></td>
+        <tr onclick="showToast('Starbucks — visited 3x this week, ₹840 total')">
+          <td><span class="tx-merchant">Starbucks</span> <span class="tx-flag" onclick="event.stopPropagation();showToast('Daily habit detected — ₹3,000/mo at this rate')">⚑ daily habit</span></td>
           <td class="tx-date">Jul 12</td>
           <td><span class="tx-cat cat-food">Food & Dining</span></td>
-          <td class="tx-amount amount-out">₹180</td>
+          <td class="tx-amount">₹180</td>
         </tr>
-        <tr>
-          <td><span class="tx-merchant">Spotify + Apple Music</span> <span class="tx-flag">⚑ duplicate</span></td>
+        <tr onclick="showToast('Duplicate alert! Spotify + Apple Music both active')">
+          <td><span class="tx-merchant">Spotify + Apple Music</span> <span class="tx-flag" onclick="event.stopPropagation();showToast('Duplicate subscriptions — cancel one to save ₹1,188/yr')">⚑ duplicate</span></td>
           <td class="tx-date">Jul 13</td>
           <td><span class="tx-cat cat-sub">Subscription</span></td>
-          <td class="tx-amount amount-out">₹499</td>
+          <td class="tx-amount">₹499</td>
         </tr>
-        <tr>
+        <tr onclick="showToast('Flipkart — gadget accessories, Jul 17 impulse buy')">
           <td><span class="tx-merchant">Flipkart</span></td>
           <td class="tx-date">Jul 17</td>
           <td><span class="tx-cat cat-shopping">Shopping</span></td>
-          <td class="tx-amount amount-out">₹3,500</td>
+          <td class="tx-amount">₹3,500</td>
         </tr>
       </tbody>
     </table>
-    <div style="padding:12px 16px;border-top:0.5px solid var(--color-border-tertiary);font-size:12px;color:var(--color-text-secondary);">
-      Showing 7 of 20 transactions
+    <div style="padding:12px 16px;border-top:0.5px solid var(--color-border-tertiary);font-size:12px;color:var(--color-text-secondary);display:flex;justify-content:space-between;align-items:center;">
+      <span>Showing 7 of 20 transactions</span>
+      <span style="cursor:pointer;color:var(--color-text-primary);font-size:12px;" onclick="showToast('Loading all 20 transactions...')">View all →</span>
     </div>
   </div>
 
-  <!-- WASTE + METER -->
+  <!-- WASTE -->
   <div class="waste-row">
     <div class="waste-card">
       <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px;">Waste score</div>
       <div style="font-size:12px;color:var(--color-text-secondary);">Based on patterns detected</div>
       <div style="display:flex;align-items:baseline;gap:6px;margin-top:10px;">
-        <span class="score-num" style="color:var(--color-text-warning);">68</span>
+        <span class="score-num" id="scoreNum" style="color:var(--color-text-warning);">68</span>
         <span style="font-size:13px;color:var(--color-text-secondary);">/ 100</span>
       </div>
-      <div class="meter-track" style="margin-top:10px;">
-        <div class="meter-fill" style="width:68%;background:#EF9F27;"></div>
+      <div class="meter-track" onclick="showToast('Score: 68/100 — moderate waste detected')" onmouseenter="tip(event,'Click for breakdown')" onmouseleave="hideTip()">
+        <div class="meter-fill" id="wasteFill" style="width:68%;background:#EF9F27;"></div>
       </div>
       <div class="meter-labels"><span>Efficient</span><span>Wasteful</span></div>
     </div>
     <div class="waste-card">
       <div style="font-size:13px;font-weight:500;margin-bottom:8px;color:var(--color-text-primary);">Patterns detected</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div style="width:6px;height:6px;border-radius:50%;background:var(--color-text-warning);flex-shrink:0;"></div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div class="pattern-row" onclick="showToast('₹840 on Starbucks this week alone')">
+          <div class="pattern-dot" style="background:var(--color-text-warning);"></div>
           <span style="font-size:13px;color:var(--color-text-secondary);">3 Starbucks visits this week (₹840)</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div style="width:6px;height:6px;border-radius:50%;background:var(--color-text-danger);flex-shrink:0;"></div>
+        <div class="pattern-row" onclick="showToast('Cancel Apple Music — save ₹99/mo')">
+          <div class="pattern-dot" style="background:var(--color-text-danger);"></div>
           <span style="font-size:13px;color:var(--color-text-secondary);">Duplicate streaming subs — Spotify + Apple Music</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div style="width:6px;height:6px;border-radius:50%;background:var(--color-text-warning);flex-shrink:0;"></div>
+        <div class="pattern-row" onclick="showToast('Food delivery at ₹16,890/month pace!')">
+          <div class="pattern-dot" style="background:var(--color-text-warning);"></div>
           <span style="font-size:13px;color:var(--color-text-secondary);">Food delivery 8x in 10 days (₹5,630)</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div style="width:6px;height:6px;border-radius:50%;background:var(--color-text-info);flex-shrink:0;"></div>
+        <div class="pattern-row" onclick="showToast('Jul 17: ₹3,740 spent in one day')">
+          <div class="pattern-dot" style="background:var(--color-text-info);"></div>
           <span style="font-size:13px;color:var(--color-text-secondary);">Impulse shopping spike on Jul 17</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ACTION PLAN -->
+  <!-- ACTIONS -->
   <div class="section-label" style="margin-bottom:14px;">Action plan — 3 decisions to make today</div>
   <div class="actions-grid">
-    <div class="action-card">
+    <div class="action-card" onclick="sendPrompt('How do I cancel one of my streaming subscriptions and save money? I have both Spotify and Apple Music.')">
       <div class="action-icon-wrap icon-save">
         <svg class="icon-svg" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M3 7l5-5 5 5" stroke="var(--color-text-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
@@ -473,9 +518,9 @@ https://example.com/my-receipts"></textarea>
         <div class="action-title">Cut one streaming subscription</div>
         <div class="action-desc">You're paying for both Spotify (₹119) and Apple Music (₹99) — both serve the same purpose. Cancel one today and automate the saving.</div>
       </div>
-      <div class="action-saving">Save ₹1,188/yr</div>
+      <div class="action-saving">Save ₹1,188/yr ↗</div>
     </div>
-    <div class="action-card">
+    <div class="action-card" onclick="sendPrompt('Help me set a food delivery budget. I spent ₹5,630 on Swiggy and Zomato in 10 days.')">
       <div class="action-icon-wrap icon-warn">
         <svg class="icon-svg" viewBox="0 0 16 16" fill="none"><path d="M8 6v4M8 12h.01M8 2L1 14h14L8 2z" stroke="var(--color-text-warning)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
@@ -483,9 +528,9 @@ https://example.com/my-receipts"></textarea>
         <div class="action-title">Set a food delivery budget</div>
         <div class="action-desc">You spent ₹5,630 on Swiggy and Zomato in 10 days — that's ₹16,890/month pace. Set a weekly cap of ₹1,500 and cook at least 3 meals at home.</div>
       </div>
-      <div class="action-saving">Save ₹8,000/mo</div>
+      <div class="action-saving">Save ₹8,000/mo ↗</div>
     </div>
-    <div class="action-card">
+    <div class="action-card" onclick="sendPrompt('I spend ₹840/week at Starbucks. How can I cut this habit and redirect savings to investments?')">
       <div class="action-icon-wrap icon-cut">
         <svg class="icon-svg" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="var(--color-text-danger)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
@@ -493,76 +538,13 @@ https://example.com/my-receipts"></textarea>
         <div class="action-title">Replace Starbucks with home coffee</div>
         <div class="action-desc">3 visits at ₹280 avg = ₹840 this week. Brewing at home costs ~₹30/cup. Redirect the ₹750+ weekly saving into a SIP or emergency fund.</div>
       </div>
-      <div class="action-saving">Save ₹3,000/mo</div>
+      <div class="action-saving">Save ₹3,000/mo ↗</div>
     </div>
   </div>
 
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script>
-  const ta = document.getElementById('demoTA');
-  const cc = document.getElementById('charCount');
-  ta.addEventListener('input', () => { cc.textContent = ta.value.length + ' characters'; });
-
-  document.querySelectorAll('.itab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.itab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-    });
-  });
-
-  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-  const textColor = isDark ? '#aaa' : '#888';
-
-  window.donutChart = new Chart(document.getElementById('donutChart'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Food & Dining','Shopping','Subscriptions','Transport','Other'],
-      datasets: [{
-        data: [38, 31, 12, 10, 9],
-        backgroundColor: ['#EF9F27','#7F77DD','#378ADD','#1D9E75','#888780'],
-        borderWidth: 2,
-        borderColor: isDark ? '#1a1a1a' : '#fff',
-        hoverOffset: 4
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, cutout: '62%',
-      plugins: { legend: { display: false }, tooltip: {
-        callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.raw + '%' }
-      }}
-    }
-  });
-
-  window.lineChart = new Chart(document.getElementById('lineChart'), {
-    type: 'line',
-    data: {
-      labels: ['Jul 10','Jul 11','Jul 12','Jul 13','Jul 14','Jul 15','Jul 16','Jul 17','Jul 18','Jul 19'],
-      datasets: [{
-        label: 'Spending (₹)',
-        data: [1049, 970, 2580, 839, 1699, 355, 1458, 3740, 1100, 649],
-        borderColor: '#7F77DD',
-        backgroundColor: isDark ? 'rgba(127,119,221,0.08)' : 'rgba(127,119,221,0.07)',
-        borderWidth: 1.5,
-        pointRadius: 3,
-        pointBackgroundColor: '#7F77DD',
-        tension: 0.35,
-        fill: true
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: {
-        callbacks: { label: ctx => ' ₹' + ctx.raw.toLocaleString('en-IN') }
-      }},
-      scales: {
-        x: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 5 } },
-        y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 }, callback: v => '₹' + (v/1000).toFixed(0) + 'k' } }
-      }
-    }
-  });
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js">
   async function sendPrompt(defaultPrompt) {
     const text = document.getElementById('demoTA').value || defaultPrompt;
     const btn = document.querySelector('.btn-analyze');
@@ -602,6 +584,247 @@ https://example.com/my-receipts"></textarea>
       } catch (parseError) {
         console.error("AI did not return valid JSON:", data.response);
         alert("The AI returned a plain text response instead of valid JSON charts:\n\n" + data.response);
+      }
+      
+    } catch(e) {
+      alert("Error calling AI: " + e);
+    }
+    
+    btn.innerHTML = oldText;
+    btn.disabled = false;
+  }
+</script>
+<script>
+  const ta = document.getElementById('demoTA');
+  const cc = document.getElementById('charCount');
+  ta.addEventListener('input', () => { cc.textContent = ta.value.length + ' characters'; });
+
+  function switchTab(el, name) {
+    document.querySelectorAll('.itab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    showToast('Switched to ' + name);
+  }
+
+  function toggleChip(el) {
+    el.classList.toggle('active');
+  }
+
+  let liveOn = true;
+  function toggleLive() {
+    liveOn = !liveOn;
+    const p = document.getElementById('livePill');
+    p.textContent = liveOn ? 'Live' : 'Paused';
+    p.style.background = liveOn ? 'var(--color-background-success)' : 'var(--color-background-secondary)';
+    p.style.color = liveOn ? 'var(--color-text-success)' : 'var(--color-text-secondary)';
+    showToast(liveOn ? 'Live updates resumed' : 'Updates paused');
+  }
+
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  const tipEl = document.getElementById('tippy');
+  function tip(e, msg) {
+    tipEl.textContent = msg;
+    tipEl.style.left = (e.clientX + 10) + 'px';
+    tipEl.style.top = (e.clientY - 32) + 'px';
+    tipEl.classList.add('show');
+  }
+  function hideTip() { tipEl.classList.remove('show'); }
+  document.addEventListener('mousemove', e => {
+    tipEl.style.left = (e.clientX + 12) + 'px';
+    tipEl.style.top = (e.clientY - 34) + 'px';
+  });
+
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const textColor = isDark ? '#aaa' : '#888';
+
+  window.donutChart = new Chart(document.getElementById('donutChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Food & Dining','Shopping','Subscriptions','Transport','Other'],
+      datasets: [{
+        data: [38,31,12,10,9],
+        backgroundColor: ['#EF9F27','#7F77DD','#378ADD','#1D9E75','#888780'],
+        borderWidth: 2,
+        borderColor: isDark ? '#1a1a1a' : '#fff',
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.raw + '%' } }
+      },
+      onClick: (e, els) => {
+        if (els.length) {
+          const labels = ['Food & Dining','Shopping','Subscriptions','Transport','Other'];
+          const amts = ['₹5,630','₹4,594','₹1,796','₹1,482','₹1,334'];
+          const i = els[0].index;
+          showToast(labels[i] + ': ' + amts[i]);
+        }
+      }
+    }
+  });
+
+  window.lineChart = new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: {
+      labels: ['Jul 10','Jul 11','Jul 12','Jul 13','Jul 14','Jul 15','Jul 16','Jul 17','Jul 18','Jul 19'],
+      datasets: [{
+        label: 'Spending (₹)',
+        data: [1049,970,2580,839,1699,355,1458,3740,1100,649],
+        borderColor: '#7F77DD',
+        backgroundColor: isDark ? 'rgba(127,119,221,0.08)' : 'rgba(127,119,221,0.07)',
+        borderWidth: 1.5,
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#7F77DD',
+        tension: 0.35, fill: true
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ' ₹' + ctx.raw.toLocaleString('en-IN') } }
+      },
+      onClick: (e, els) => {
+        if (els.length) {
+          const days = ['Jul 10','Jul 11','Jul 12','Jul 13','Jul 14','Jul 15','Jul 16','Jul 17','Jul 18','Jul 19'];
+          const vals = [1049,970,2580,839,1699,355,1458,3740,1100,649];
+          const i = els[0].index;
+          showToast(days[i] + ': ₹' + vals[i].toLocaleString('en-IN') + ' spent');
+        }
+      },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 5 } },
+        y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 }, callback: v => '₹' + (v/1000).toFixed(0) + 'k' } }
+      }
+    }
+  });
+
+  async function sendPrompt(defaultPrompt) {
+    const text = document.getElementById('demoTA').value || defaultPrompt;
+    const btn = document.querySelector('.btn-analyze');
+    const oldText = btn.innerHTML;
+    btn.innerHTML = "Analyzing...";
+    btn.disabled = true;
+
+    try {
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text })
+      });
+      const data = await response.json();
+      
+      try {
+        const aiData = JSON.parse(data.response);
+        
+        // 1. Stat Cards
+        document.getElementById('stat-total').innerText = '₹' + aiData.total_spent.toLocaleString('en-IN');
+        document.getElementById('stat-tx').innerText = aiData.transaction_count;
+        document.getElementById('stat-top-cat').innerText = aiData.top_category_name;
+        document.getElementById('stat-top-val').innerText = `₹${aiData.top_category_amount} — ${aiData.top_category_percent}`;
+        document.getElementById('stat-sub-val').innerText = '₹' + aiData.subscriptions_total;
+        document.getElementById('stat-sub-count').innerText = `${aiData.subscriptions_count} active`;
+        // avg transaction (optional stat card)
+        const avgEl = document.getElementById('stat-avg');
+        if (avgEl && aiData.avg_transaction) avgEl.innerText = '₹' + Math.round(aiData.avg_transaction).toLocaleString('en-IN');
+
+        // 2. Donut Chart — now 9 categories
+        const donutLabels = ['Food & Dining','Shopping','Transport','Subscriptions','Bills','Healthcare','Grocery','Fitness','Other'];
+        const donutColors = ['#EF9F27','#7F77DD','#1D9E75','#378ADD','#E84393','#F87171','#34D399','#60A5FA','#888780'];
+        window.donutChart.data.labels = donutLabels;
+        window.donutChart.data.datasets[0].data = aiData.donut;
+        window.donutChart.data.datasets[0].backgroundColor = donutColors;
+        window.donutChart.update();
+
+        // 3. Line Chart
+        window.lineChart.data.labels = aiData.line_labels;
+        window.lineChart.data.datasets[0].data = aiData.line_data;
+        window.lineChart.update();
+
+        // 4. Transactions Table
+        const catClassMap = { food:'cat-food', shopping:'cat-shopping', subscriptions:'cat-sub', transport:'cat-transport', bills:'', healthcare:'', grocery:'', fitness:'', other:'' };
+        const catLabelMap = { food:'Food & Dining', shopping:'Shopping', subscriptions:'Subscription', transport:'Transport', bills:'Bills', healthcare:'Healthcare', grocery:'Grocery', fitness:'Fitness', other:'Other' };
+        if (aiData.transactions && aiData.transactions.length > 0) {
+          const tbody = document.querySelector('.tx-card tbody');
+          tbody.innerHTML = aiData.transactions.map(tx => {
+            const catClass = catClassMap[tx.category] || '';
+            const catLabel = catLabelMap[tx.category] || tx.category;
+            return `<tr onclick="showToast('${tx.merchant} — ₹${Number(tx.amount).toLocaleString(\'en-IN\')}')">
+              <td><span class="tx-merchant">${tx.merchant}</span></td>
+              <td class="tx-date">${tx.date}</td>
+              <td><span class="tx-cat ${catClass}">${catLabel}</span></td>
+              <td class="tx-amount">₹${Number(tx.amount).toLocaleString('en-IN')}</td>
+            </tr>`;
+          }).join('');
+          const txFooter = document.querySelector('.tx-card > div:last-child span:first-child');
+          if (txFooter) txFooter.textContent = `Showing ${aiData.transactions.length} of ${aiData.transaction_count} transactions`;
+        }
+
+        // 5. Waste Score Meter
+        if (aiData.waste_score !== undefined) {
+          const score = aiData.waste_score;
+          const scoreEl = document.getElementById('scoreNum');
+          const fillEl = document.getElementById('wasteFill');
+          if (scoreEl) { scoreEl.innerText = score; }
+          if (fillEl) {
+            fillEl.style.width = score + '%';
+            fillEl.style.background = score < 30 ? '#1D9E75' : score < 60 ? '#EF9F27' : '#F87171';
+          }
+          if (scoreEl) scoreEl.style.color = score < 30 ? 'var(--color-text-success)' : score < 60 ? 'var(--color-text-warning)' : 'var(--color-text-danger)';
+        }
+
+        // 6. Patterns
+        if (aiData.patterns && aiData.patterns.length > 0) {
+          const patternColors = ['var(--color-text-warning)','var(--color-text-danger)','var(--color-text-warning)','var(--color-text-info)'];
+          const patternsContainer = document.querySelector('.waste-row .waste-card:last-child > div:last-child');
+          if (patternsContainer) {
+            patternsContainer.innerHTML = aiData.patterns.map((p, i) => `
+              <div class="pattern-row" onclick="showToast('${p.replace(/'/g, "\\'")}')">
+                <div class="pattern-dot" style="background:${patternColors[i % patternColors.length]};"></div>
+                <span style="font-size:13px;color:var(--color-text-secondary);">${p}</span>
+              </div>`).join('');
+          }
+        }
+
+        // 7. Action Plan Cards
+        if (aiData.action_plan && aiData.action_plan.length > 0) {
+          const icons = [
+            `<svg class="icon-svg" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M3 7l5-5 5 5" stroke="var(--color-text-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+            `<svg class="icon-svg" viewBox="0 0 16 16" fill="none"><path d="M8 6v4M8 12h.01M8 2L1 14h14L8 2z" stroke="var(--color-text-warning)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+            `<svg class="icon-svg" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="var(--color-text-danger)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+          ];
+          const iconBgs = ['icon-save','icon-warn','icon-cut'];
+          const actionsGrid = document.querySelector('.actions-grid');
+          if (actionsGrid) {
+            actionsGrid.innerHTML = aiData.action_plan.map((a, i) => `
+              <div class="action-card" onclick="showToast('${a.title.replace(/'/g, "\\'")}')">
+                <div class="action-icon-wrap ${iconBgs[i % 3]}">${icons[i % 3]}</div>
+                <div>
+                  <div class="action-title">${a.title}</div>
+                  <div class="action-desc">${a.desc}</div>
+                </div>
+                <div class="action-saving">${a.saving} ↗</div>
+              </div>`).join('');
+          }
+        }
+
+        showToast('Analysis complete! ✓');
+        
+      } catch (parseError) {
+        console.error("AI parse error:", parseError, data.response);;
+        alert("The AI response could not be parsed:\n\n" + data.response);
       }
       
     } catch(e) {
