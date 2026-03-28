@@ -123,6 +123,10 @@
     .cat-transport { background: rgba(29, 158, 117, 0.2); color: #1D9E75; }
     .cat-shopping { background: rgba(127, 119, 221, 0.2); color: #7F77DD; }
     .cat-sub { background: rgba(55, 138, 221, 0.2); color: #378ADD; }
+    .cat-bills { background: rgba(232, 67, 147, 0.2); color: #E84393; }
+    .cat-healthcare { background: rgba(248, 113, 113, 0.2); color: #F87171; }
+    .cat-grocery { background: rgba(52, 211, 153, 0.2); color: #34D399; }
+    .cat-fitness { background: rgba(96, 165, 250, 0.2); color: #60A5FA; }
 
     .waste-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
     .waste-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px; }
@@ -264,7 +268,7 @@
         plugins: { legend: { display: false } },
         scales: {
           x: {
-            ticks: { color: 'rgba(255,255,255,0.5)', maxRotation: 45, minRotation: 30, font: { size: 10 } },
+            ticks: { display: false },
             grid: { color: 'rgba(255,255,255,0.04)' }
           },
           y: { beginAtZero: true, ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
@@ -311,7 +315,7 @@
         lineChart.data.datasets[0].data = aiData.line_data;
         lineChart.update();
 
-        const catClassMap = { food:'cat-food', shopping:'cat-shopping', subscriptions:'cat-sub', transport:'cat-transport' };
+        const catClassMap = { food:'cat-food', shopping:'cat-shopping', subscriptions:'cat-sub', transport:'cat-transport', bills:'cat-bills', healthcare:'cat-healthcare', grocery:'cat-grocery', fitness:'cat-fitness' };
         document.getElementById('txBody').innerHTML = (aiData.transactions || []).map(tx => `<tr><td>${tx.merchant}</td><td>${tx.date}</td><td><span class="tx-cat ${catClassMap[tx.category] || ''}">${tx.category}</span></td><td style="text-align:right">₹${Number(tx.amount).toLocaleString('en-IN')}</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;padding:40px;opacity:0.3">No transactions found</td></tr>';
 
         const score = Number(aiData.waste_score) || 0;

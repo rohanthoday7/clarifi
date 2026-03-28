@@ -35,10 +35,11 @@ DATE_RE    = re.compile(
 )
 NOISE_RE   = re.compile(
     r'\b(?:paid|debited|debit|payment\s+to|txn\s+at|transaction|upi|neft|imps|'
-    r'vpa|a/c|ac\b|acct|account|ref(?:erence)?(?:\s+no\.?)?'
-    r'|[A-Z0-9]{10,})\b',   # strip long ref codes
+    r'vpa|a/c|ac\b|acct|account|ref(?:erence)?(?:\s+no\.?)?)\b',
     re.IGNORECASE
 )
+# Separate pattern for ref codes: only uppercase+digits, 12+ chars (avoids stripping merchant names)
+REFCODE_RE = re.compile(r'\b[A-Z0-9]{12,}\b')
 
 
 # ── Server-side transaction parser ──────────────────────────────────────────
@@ -79,8 +80,12 @@ def parse_raw_text(text: str):
         merchant = AMOUNT_RE.sub('', merchant)
         merchant = BARE_NUM_RE.sub('', merchant)
         if date_m:
-            merchant = merchant.replace(date_m.group(1), '')
+            # Remove the full date match
+            merchant = merchant.replace(date_m.group(0), '')
+        # Remove stray month abbreviations left behind (Jan, Feb, Aug, etc.)
+        merchant = re.sub(r'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\b', '', merchant, flags=re.IGNORECASE)
         merchant = NOISE_RE.sub(' ', merchant)
+        merchant = REFCODE_RE.sub('', merchant)
         merchant = re.sub(r'[₹:,|\-]+', ' ', merchant)
         merchant = re.sub(r'\s+', ' ', merchant).strip().strip(':,-.')
         if not merchant:
@@ -157,23 +162,18 @@ def compute_analytics(data: dict, expense_txns: list[dict]) -> dict:
     else:
         data["donut"] = [0] * 8
 
-    # Line chart — one point per transaction, in date order
-    # Use date as label if available, else abbreviated merchant name
-    def sort_key(t: dict) -> str:
-        d = t.get("date", "")
-        if not d:
-            return "zzz"  # push undated to end
-        # Normalise for sorting: extract leading digits
-        num = re.match(r'^(\d+)', d)
-        return f"{int(num.group(1)):02d}_{d}" if num else d
-
-    sorted_txns = sorted(expense_txns, key=sort_key)
+    # Line chart — one point per transaction, in original input order
+    # (users paste data chronologically, so input order = correct order)
     line_labels: list[str] = []
     line_data: list[float] = []
-    for t in sorted_txns:
-        # Use the merchant / keyword for the timeline instead of just the date
-        label = str(t.get("merchant", "Tx") or "Tx")[:20]  # type: ignore
-        line_labels.append(label)
+    for t in expense_txns:
+        merchant = str(t.get("merchant", "Tx") or "Tx")
+        date = str(t.get("date", "") or "")
+        if date:
+            label = f"{date}: {merchant}"
+        else:
+            label = merchant
+        line_labels.append(label[:25])  # type: ignore[index]
         line_data.append(int(float(t["amount"]) * 100) / 100.0)
 
     data["line_labels"] = line_labels
