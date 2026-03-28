@@ -18,11 +18,17 @@ BRIGHTDATA_ZONE = os.getenv("BRIGHTDATA_ZONE", "web_unlocker1")
 CATEGORY_ORDER = ["food", "shopping", "transport", "subscriptions", "bills", "healthcare", "grocery", "fitness"]
 
 # Keywords that signal an incoming credit/refund (not an expense)
+# These are matched with word boundaries to avoid false positives
 CREDIT_KEYWORDS = [
     'received', 'refund', 'cashback', 'credited', 'salary',
-    'split', 'returned', 'credit', 'income', 'earning',
+    'returned', 'income', 'earning',
     'deposited', 'reversal', 'reimbursed',
 ]
+# Compile a single pattern for efficiency
+CREDIT_RE = re.compile(
+    r'\b(?:' + '|'.join(CREDIT_KEYWORDS) + r')\b',
+    re.IGNORECASE
+)
 
 # ── Regex patterns ──────────────────────────────────────────────────────────
 AMOUNT_RE  = re.compile(r'(?:₹|Rs\.?\s*|INR\s*)([0-9,]+(?:\.[0-9]{1,2})?)', re.IGNORECASE)
@@ -56,6 +62,7 @@ def parse_raw_text(text: str):
         line = line.strip()
         if not line:
             continue
+        print(f"RAW LINE: {repr(line)}")
 
         # ① Find amount
         amt_m = AMOUNT_RE.search(line)
@@ -93,11 +100,15 @@ def parse_raw_text(text: str):
 
         # ④ Detect credit / refund
         line_lower = line.lower()
-        # Check for "from <Name>" pattern too
-        from_person = bool(re.search(r'\bfrom\s+[A-Z][a-z]', line))
-        is_credit = from_person or any(kw in line_lower for kw in CREDIT_KEYWORDS)
+        # Check for "received from <Name>" pattern instead of just "from" which catches merchants
+        from_person = bool(re.search(r'\b(?:received|got|refund)\s+from\b', line_lower))
+        # Check for "split" only in context like "dinner split", "bill split"
+        has_split = bool(re.search(r'\b(?:dinner|bill|rent|expense)\s+split\b', line_lower))
+        is_credit = from_person or has_split or bool(CREDIT_RE.search(line_lower))
 
         entry: dict = {'merchant': merchant, 'date': date_str, 'amount': amount, 'category': ''}
+        tag = 'CREDIT' if is_credit else 'EXPENSE'
+        print(f"  [{tag}] {date_str:>8} | {merchant:30} | {amount}")
         (credits if is_credit else expenses).append(entry)
 
     return expenses, credits
@@ -183,14 +194,41 @@ def compute_analytics(data: dict, expense_txns: list[dict]) -> dict:
 
 # ── JSON extractor ──────────────────────────────────────────────────────────
 def extract_json(text: str) -> dict:
+    import json
+    import re
     text = re.sub(r'```(?:json)?\s*', '', text).strip()
     start = text.find('{')
-    end = text.rfind('}')
-    if start == -1 or end == -1:
-        raise ValueError("No JSON object found in AI response")
-    json_str = text[start:end + 1]  # type: ignore
-    json_str = re.sub(r',\s*([}\]])', r'\1', json_str)  # trailing commas
-    return json.loads(json_str)
+    if start == -1:
+        raise ValueError("No JSON object found")
+    
+    # Try standard parse first
+    json_str = text[start:]  # type: ignore
+    try:
+        # Strip trailing garbage manually if it exists after the last }
+        last_brace = json_str.rfind('}')
+        if last_brace != -1:
+            clean_str = json_str[:last_brace+1]
+            return json.loads(clean_str)
+    except json.JSONDecodeError:
+        pass
+
+    # Model hallucinated badly (e.g. truncated). Regex fallback extraction:
+    result = {"categories": [], "waste_score": 0, "patterns": [], "action_plan": []}
+    
+    cat_match = re.search(r'"categories"\s*:\s*\[(.*?)\]', text)
+    if cat_match:
+        cats = re.findall(r'"([^"]+)"', cat_match.group(1))
+        result["categories"] = cats
+
+    waste_match = re.search(r'"waste_score"\s*:\s*(\d+)', text)
+    if waste_match:
+        result["waste_score"] = int(waste_match.group(1))
+        
+    pat_match = re.search(r'"patterns"\s*:\s*\[(.*?)\]', text)
+    if pat_match:
+        result["patterns"] = re.findall(r'"([^"]+)"', pat_match.group(1))
+
+    return result
 
 
 # ── Bright Data scraper ─────────────────────────────────────────────────────
